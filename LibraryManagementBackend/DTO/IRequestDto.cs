@@ -2,7 +2,7 @@
 
 using LibraryManagementBackend.Models;
 
-public interface IRequestDto<out T> where T : Entity
+public interface IRequestDto<in T> where T : Entity
 {
-    public T ToEntity();
+    public void Populate(T entity);
 }

@@ -1,11 +1,10 @@
 ﻿namespace LibraryManagementBackend.Controllers;
 
+using LibraryManagementBackend.DTO;
 using LibraryManagementBackend.DTO.Book;
-using LibraryManagementBackend.Errors;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class BookController : CrudController<Book, BookRequestDto, BookResponseDto>
@@ -23,13 +22,13 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
     {
         if (await this.categoryRepository.GetByIdAsync(dto.CategoryId) is null)
         {
-            return this.BadRequest(new Error { Message = "Category not found" });
+            return this.BadRequest(new MessageDto($"Category {dto.CategoryId} not found"));
         }
         return await base.Create(dto);
     }
 
+    // [Authorize(Policy = "User")]
     [HttpGet(nameof(Search))]
-    [Authorize(Policy = "User")]
     public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId)
     {
         return (await this.repository.Search(title, author, categoryId)).Select(BookResponseDto.FromEntity).ToList();

@@ -10,15 +10,12 @@ public class BookRequestDto : IRequestDto<Book>
     public string Content    { get; init; }
     public int    CategoryId { get; init; }
 
-    public Book ToEntity()
+    public void Populate(Book entity)
     {
-        return new()
-        {
-            Title      = this.Title,
-            Image      = this.Image,
-            Author     = this.Author,
-            Content    = this.Content,
-            CategoryId = this.CategoryId,
-        };
+        entity.Title      = this.Title;
+        entity.Image      = this.Image;
+        entity.Author     = this.Author;
+        entity.Content    = this.Content;
+        entity.CategoryId = this.CategoryId;
     }
 }

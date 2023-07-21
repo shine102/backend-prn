@@ -6,11 +6,8 @@ public class CategoryRequestDto : IRequestDto<Category>
 {
     public string Name { get; init; }
 
-    public Category ToEntity()
+    public void Populate(Category entity)
     {
-        return new()
-        {
-            Name = this.Name,
-        };
+        entity.Name = this.Name;
     }
 }
