@@ -4,9 +4,9 @@ using LibraryManagementBackend.DTO.Category;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Category;
 
-public class CategoryCrudController : CrudController<Category, CategoryRequestDto, CategoryResponseDto>
+public class CategoryController : CrudController<Category, CategoryRequestDto, CategoryResponseDto>
 {
-    public CategoryCrudController(ICategoryRepository repository) : base(repository)
+    public CategoryController(ICategoryRepository repository) : base(repository)
     {
     }
 }

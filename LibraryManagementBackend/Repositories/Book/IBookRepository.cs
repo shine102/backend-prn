@@ -4,6 +4,6 @@
 
     public interface IBookRepository : IRepository<Book>
     {
-        public Task<IEnumerable<Book>> Find(string? title, string? author, int? categoryId);
+        public Task<IEnumerable<Book>> Search(string? title, string? author, int? categoryId);
     }
 }

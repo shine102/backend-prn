@@ -11,7 +11,7 @@
 
         protected override DbSet<Book> DbSet => this.context.Books;
 
-        public async Task<IEnumerable<Book>> Find(string? title, string? author, int? categoryId)
+        public async Task<IEnumerable<Book>> Search(string? title, string? author, int? categoryId)
         {
             var books = this.DbSet.AsQueryable();
             if (title is not null)
