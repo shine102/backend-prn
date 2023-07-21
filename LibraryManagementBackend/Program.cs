@@ -1,105 +1,96 @@
-using BackEndLibManagement.Business.AuthService;
-using BackEndLibManagement.Business.BookService;
-using BackEndLibManagement.Business.CategoryService;
-using BackEndLibManagement.Business.ChatService;
-using BackEndLibManagement.Business.CommentService;
-using BackEndLibManagement.Business.UserService;
-using BackEndLibManagement.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using LibraryManagementBackend.Models;
+using LibraryManagementBackend.Repositories.Book;
+using LibraryManagementBackend.Repositories.Category;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<BackendLibManagementContext>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IChatService, ChatService>();
 
-builder.Services.AddAuthorization(opt =>
+builder.Services.AddDbContext<LibraryManagementDbContext>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+//     options.AddPolicy("User", policy => policy.RequireAuthenticatedUser());
+// });
+//
+// builder.Services.AddAuthentication(options =>
+// {
+//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+// }).AddJwtBearer(options =>
+//     {
+//         options.RequireHttpsMetadata = false;
+//         options.SaveToken            = true;
+//         options.TokenValidationParameters = new()
+//         {
+//             ValidateIssuerSigningKey = true,
+//             IssuerSigningKey         = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
+//             ValidateIssuer           = true,
+//             ValidIssuer              = builder.Configuration["JWT:Issuer"],
+//             ValidateAudience         = true,
+//             ValidAudience            = builder.Configuration["JWT:Audience"]
+//         };
+//     }
+// );
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
     {
-        opt.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-        opt.AddPolicy("User", policy => policy.RequireAuthenticatedUser());
-    }
-);
-builder.Services.AddAuthentication(opt =>
-    {
-        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }
-).AddJwtBearer(
-    opt =>
-    {
-        opt.RequireHttpsMetadata = false;
-        opt.SaveToken = true;
-        opt.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JWT:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWT:Audience"]
-        };
-    }
-);
-builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "JWT Auth Sample",
-        Version = "v1"
+        Title   = "JWT Auth Sample",
+        Version = "v1",
     });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    options.AddSecurityDefinition("Bearer", new()
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Name         = "Authorization",
+        Type         = SecuritySchemeType.ApiKey,
+        Scheme       = "Bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer jhfdkj.jkdsakjdsa.jkdsajk\"",
+        In           = ParameterLocation.Header,
+        Description  = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer jhfdkj.jkdsakjdsa.jkdsajk\"",
     });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    options.AddSecurityRequirement(new()
+    {
         {
-            new OpenApiSecurityScheme {
-                Reference = new OpenApiReference {
+            new()
+            {
+                Reference = new()
+                {
                     Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                }
+                    Id   = "Bearer",
+                },
             },
-            new string[] {}
-        }
+            new string[] { }
+        },
     });
 });
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+
+app.UseForwardedHeaders(new()
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-}
-);
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+});
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/test", () => "Hello World!");
+app.MapGet("/Test", () => "Hello World!");
 
 app.Run();
