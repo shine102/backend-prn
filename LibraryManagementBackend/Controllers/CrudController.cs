@@ -32,6 +32,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
     [HttpGet]
     public virtual async Task<ActionResult<List<TResponseDto>>> GetAll(int? page, int? pageSize)
     {
+        if (page < 1) return this.BadRequest(new MessageDto("Page must be greater than 0"));
         var entities = page is not null && pageSize is not null
             ? await this.repository.GetAllAsync((page - 1) * pageSize, pageSize)
             : await this.repository.GetAllAsync();

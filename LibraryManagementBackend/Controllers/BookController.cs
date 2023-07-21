@@ -31,6 +31,7 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
     [HttpGet(nameof(Search))]
     public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId, int? page, int? pageSize)
     {
+        if (page < 1) return this.BadRequest(new MessageDto("Page must be greater than 0"));
         var books = page is not null && pageSize is not null
             ? await this.repository.Search(title, author, categoryId, (page - 1) * pageSize, pageSize)
             : await this.repository.Search(title, author, categoryId);
