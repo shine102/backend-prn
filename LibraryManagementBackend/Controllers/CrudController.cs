@@ -30,9 +30,19 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
 
     // [Authorize(Policy = "User")]
     [HttpGet]
-    public virtual async Task<ActionResult<List<TResponseDto>>> GetAll()
+    public virtual async Task<ActionResult<List<TResponseDto>>> GetAll(int? page, int? pageSize)
     {
-        return (await this.repository.GetAllAsync()).Select(TResponseDto.FromEntity).ToList();
+        var entities = page is not null && pageSize is not null
+            ? await this.repository.GetAllAsync((page - 1) * pageSize, pageSize)
+            : await this.repository.GetAllAsync();
+        return entities.Select(TResponseDto.FromEntity).ToList();
+    }
+
+    // [Authorize(Policy = "User")]
+    [HttpGet("Count")]
+    public virtual async Task<ActionResult<CountDto>> Count()
+    {
+        return new CountDto(await this.repository.CountAsync());
     }
 
     // [Authorize(Policy = "Admin")]

@@ -29,8 +29,11 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
 
     // [Authorize(Policy = "User")]
     [HttpGet(nameof(Search))]
-    public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId)
+    public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId, int? page, int? pageSize)
     {
-        return (await this.repository.Search(title, author, categoryId)).Select(BookResponseDto.FromEntity).ToList();
+        var books = page is not null && pageSize is not null
+            ? await this.repository.Search(title, author, categoryId, (page - 1) * pageSize, pageSize)
+            : await this.repository.Search(title, author, categoryId);
+        return books.Select(BookResponseDto.FromEntity).ToList();
     }
 }

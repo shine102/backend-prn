@@ -19,9 +19,23 @@ public abstract class Repository<T> : IRepository<T> where T : Entity
         return await this.DbSet.FindAsync(id);
     }
 
-    public virtual async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync(int? skip = null, int? take = null)
     {
-        return await this.DbSet.ToListAsync();
+        var entities = this.DbSet.AsQueryable();
+        if (skip is not null)
+        {
+            entities = entities.Skip(skip.Value);
+        }
+        if (take is not null)
+        {
+            entities = entities.Take(take.Value);
+        }
+        return await entities.ToListAsync();
+    }
+
+    public virtual Task<int> CountAsync()
+    {
+        return this.DbSet.CountAsync();
     }
 
     public virtual async Task<bool> CreateAsync(T entity)
