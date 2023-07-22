@@ -1,11 +1,7 @@
-using System.Security.Claims;
-using System.Text;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +12,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<LibraryManagementDbContext>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // builder.Services.AddAuthorization(options =>
 // {
@@ -86,6 +92,8 @@ app.UseForwardedHeaders(new()
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
 });
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
