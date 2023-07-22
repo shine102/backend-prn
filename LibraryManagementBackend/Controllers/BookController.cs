@@ -1,6 +1,5 @@
 ﻿namespace LibraryManagementBackend.Controllers;
 
-using LibraryManagementBackend.DTO;
 using LibraryManagementBackend.DTO.Book;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
@@ -20,10 +19,7 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
 
     public override async Task<ActionResult<BookResponseDto>> Create(BookRequestDto dto)
     {
-        if (await this.categoryRepository.GetByIdAsync(dto.CategoryId) is null)
-        {
-            return this.BadRequest(new MessageDto($"Category {dto.CategoryId} not found"));
-        }
+        if (await this.categoryRepository.GetByIdAsync(dto.CategoryId) is null) return this.BadRequest();
         return await base.Create(dto);
     }
 
@@ -31,10 +27,17 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
     [HttpGet(nameof(Search))]
     public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId, int? page, int? pageSize)
     {
-        if (page < 1) return this.BadRequest(new MessageDto("Page must be greater than 0"));
+        if (page < 1) return this.BadRequest();
         var books = page is not null && pageSize is not null
-            ? await this.repository.Search(title, author, categoryId, (page - 1) * pageSize, pageSize)
-            : await this.repository.Search(title, author, categoryId);
+            ? await this.repository.SearchAsync(title, author, categoryId, (page - 1) * pageSize, pageSize)
+            : await this.repository.SearchAsync(title, author, categoryId);
         return books.Select(BookResponseDto.FromEntity).ToList();
+    }
+
+    // [Authorize(Policy = "User")]
+    [HttpGet(nameof(Count))]
+    public async Task<ActionResult<int>> Count(string? title, string? author, int? categoryId)
+    {
+        return await this.repository.CountAsync(title, author, categoryId);
     }
 }

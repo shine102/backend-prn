@@ -29,10 +29,10 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
     }
 
     // [Authorize(Policy = "User")]
-    [HttpGet]
+    [HttpGet(nameof(GetAll))]
     public virtual async Task<ActionResult<List<TResponseDto>>> GetAll(int? page, int? pageSize)
     {
-        if (page < 1) return this.BadRequest(new MessageDto("Page must be greater than 0"));
+        if (page < 1) return this.BadRequest();
         var entities = page is not null && pageSize is not null
             ? await this.repository.GetAllAsync((page - 1) * pageSize, pageSize)
             : await this.repository.GetAllAsync();
@@ -40,10 +40,10 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
     }
 
     // [Authorize(Policy = "User")]
-    [HttpGet("Count")]
-    public virtual async Task<ActionResult<CountDto>> Count()
+    [HttpGet(nameof(CountAll))]
+    public virtual async Task<ActionResult<int>> CountAll()
     {
-        return new CountDto(await this.repository.CountAsync());
+        return await this.repository.CountAsync();
     }
 
     // [Authorize(Policy = "Admin")]
@@ -58,32 +58,22 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
 
     // [Authorize(Policy = "Admin")]
     [HttpPut("{id:int}")]
-    public virtual async Task<ActionResult<MessageDto>> Update(int id, TRequestDto dto)
+    public virtual async Task<ActionResult> Update(int id, TRequestDto dto)
     {
         var entity = await this.repository.GetByIdAsync(id);
-        if (entity is null) return this.NotFound(id);
+        if (entity is null) return this.NotFound();
         dto.Populate(entity);
         if (!await this.repository.UpdateAsync(entity)) return this.BadRequest();
-        return new MessageDto($"{typeof(T).Name} {id} updated");
+        return this.Ok();
     }
 
     // [Authorize(Policy = "Admin")]
     [HttpDelete("{id:int}")]
-    public virtual async Task<ActionResult<MessageDto>> Delete(int id)
+    public virtual async Task<ActionResult> Delete(int id)
     {
         var entity = await this.repository.GetByIdAsync(id);
-        if (entity is null) return this.NotFound(id);
+        if (entity is null) return this.NotFound();
         if (!await this.repository.DeleteAsync(entity)) return this.BadRequest();
-        return new MessageDto($"{typeof(T).Name} {id} deleted");
-    }
-
-    protected virtual NotFoundObjectResult NotFound(int id)
-    {
-        return base.NotFound(new MessageDto($"{typeof(T).Name} {id} not found"));
-    }
-
-    protected new virtual BadRequestObjectResult BadRequest()
-    {
-        return base.BadRequest(new MessageDto("Invalid request"));
+        return this.Ok();
     }
 }
