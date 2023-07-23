@@ -4,6 +4,7 @@ using LibraryManagementBackend.DTO.Book;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class BookController : CrudController<Book, BookRequestDto, BookResponseDto>
@@ -23,7 +24,7 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
         return await base.Create(dto);
     }
 
-    // [Authorize(Policy = "User")]
+    [Authorize(Policy = "User")]
     [HttpGet(nameof(Search))]
     public async Task<ActionResult<List<BookResponseDto>>> Search(string? title, string? author, int? categoryId, int? page, int? pageSize)
     {
@@ -34,7 +35,7 @@ public class BookController : CrudController<Book, BookRequestDto, BookResponseD
         return books.Select(BookResponseDto.FromEntity).ToList();
     }
 
-    // [Authorize(Policy = "User")]
+    [Authorize(Policy = "User")]
     [HttpGet(nameof(Count))]
     public async Task<ActionResult<int>> Count(string? title, string? author, int? categoryId)
     {

@@ -3,6 +3,7 @@
 using LibraryManagementBackend.DTO;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -19,7 +20,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
         this.repository = repository;
     }
 
-    // [Authorize(Policy = "User")]
+    [Authorize(Policy = "User")]
     [HttpGet("{id:int}")]
     public virtual async Task<ActionResult<TResponseDto>> GetById(int id)
     {
@@ -28,7 +29,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
         return TResponseDto.FromEntity(entity);
     }
 
-    // [Authorize(Policy = "User")]
+    [Authorize(Policy = "User")]
     [HttpGet(nameof(GetAll))]
     public virtual async Task<ActionResult<List<TResponseDto>>> GetAll(int? page, int? pageSize)
     {
@@ -39,14 +40,14 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
         return entities.Select(TResponseDto.FromEntity).ToList();
     }
 
-    // [Authorize(Policy = "User")]
+    [Authorize(Policy = "User")]
     [HttpGet(nameof(CountAll))]
     public virtual async Task<ActionResult<int>> CountAll()
     {
         return await this.repository.CountAsync();
     }
 
-    // [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpPost]
     public virtual async Task<ActionResult<TResponseDto>> Create(TRequestDto dto)
     {
@@ -56,7 +57,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
         return TResponseDto.FromEntity(entity);
     }
 
-    // [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpPut("{id:int}")]
     public virtual async Task<ActionResult> Update(int id, TRequestDto dto)
     {
@@ -67,7 +68,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
         return this.Ok();
     }
 
-    // [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpDelete("{id:int}")]
     public virtual async Task<ActionResult> Delete(int id)
     {

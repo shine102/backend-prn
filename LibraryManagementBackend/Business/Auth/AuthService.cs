@@ -8,12 +8,12 @@ using System.Text;
 
 namespace LibraryManagementBackend.Business.Auth
 {
-	public class Auth
+	public class AuthService
 	{
 		private readonly IUserRepository userRepository;
 		private readonly IConfiguration _configuration;
 
-		public Auth(IUserRepository userRepository, IConfiguration configuration)
+		public AuthService(IUserRepository userRepository, IConfiguration configuration)
 		{
 			this.userRepository = userRepository;
 			_configuration = configuration;

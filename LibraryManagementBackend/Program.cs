@@ -1,3 +1,4 @@
+using LibraryManagementBackend.Business.Auth;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<LibraryManagementDbContext>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository,  UserRepository>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddCors(options =>
 {
