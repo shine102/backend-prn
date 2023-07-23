@@ -2,6 +2,7 @@ using LibraryManagementBackend.Business.Auth;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
+using LibraryManagementBackend.Repositories.CommentRepo;
 using LibraryManagementBackend.Repositories.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -18,7 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<LibraryManagementDbContext>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IUserRepository,  UserRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddCors(options =>

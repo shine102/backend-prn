@@ -11,7 +11,7 @@ namespace LibraryManagementBackend.Controllers
 {
     [ApiController]
     [Route("Api/[Controller]")]
-    public class UserController 
+    public class UserController : ControllerBase
     {
         private readonly UserRepository userRepository;
         public UserController(UserRepository userRepository) { 
