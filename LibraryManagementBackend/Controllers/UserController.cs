@@ -3,7 +3,6 @@ using LibraryManagementBackend.DTO.CommentDTO;
 using LibraryManagementBackend.DTO.UserDTO;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.CommentRepo;
-using LibraryManagementBackend.Repositories.UserRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.NetworkInformation;
