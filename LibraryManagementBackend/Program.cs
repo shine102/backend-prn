@@ -1,4 +1,6 @@
 using LibraryManagementBackend.Business.Auth;
+using LibraryManagementBackend.Business.ChatService;
+using LibraryManagementBackend.Hubs;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
@@ -12,6 +14,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -20,14 +23,16 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository,  UserRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5500")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -104,6 +109,8 @@ app.UseForwardedHeaders(new()
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
 
