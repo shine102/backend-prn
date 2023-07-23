@@ -1,8 +1,14 @@
+using LibraryManagementBackend.Business.Auth;
 using LibraryManagementBackend.Models;
 using LibraryManagementBackend.Repositories.Book;
 using LibraryManagementBackend.Repositories.Category;
+using LibraryManagementBackend.Repositories.User;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +18,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<LibraryManagementDbContext>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IUserRepository,  UserRepository>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddCors(options =>
 {
@@ -23,31 +31,31 @@ builder.Services.AddCors(options =>
     });
 });
 
-// builder.Services.AddAuthorization(options =>
-// {
-//     options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-//     options.AddPolicy("User", policy => policy.RequireAuthenticatedUser());
-// });
-//
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(options =>
-//     {
-//         options.RequireHttpsMetadata = false;
-//         options.SaveToken            = true;
-//         options.TokenValidationParameters = new()
-//         {
-//             ValidateIssuerSigningKey = true,
-//             IssuerSigningKey         = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
-//             ValidateIssuer           = true,
-//             ValidIssuer              = builder.Configuration["JWT:Issuer"],
-//             ValidateAudience         = true,
-//             ValidAudience            = builder.Configuration["JWT:Audience"]
-//         };
-//     }
-// );
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+    options.AddPolicy("User", policy => policy.RequireAuthenticatedUser());
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken            = true;
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
+            ValidateIssuer           = true,
+            ValidIssuer              = builder.Configuration["JWT:Issuer"],
+            ValidateAudience         = true,
+            ValidAudience            = builder.Configuration["JWT:Audience"]
+        };
+    }
+);
 
 builder.Services.AddSwaggerGen(options =>
 {
