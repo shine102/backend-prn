@@ -23,4 +23,19 @@ public class LibraryManagementDbContext : DbContext
             sqlOptions.EnableRetryOnFailure();
         });
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>().HasData(new User
+        {
+            Id             = -1,
+            Username       = "admin",
+            Password       = "$2a$12$yrV/MXrEkAGn51voH2jgpevQbLulaj3GyfG4KUZSJh83a34mJny16",
+            IsAdmin        = true,
+            Phone          = "",
+            CredentialCode = "",
+        });
+    }
 }
