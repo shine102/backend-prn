@@ -5,7 +5,7 @@ namespace LibraryManagementBackend.DTO.CommentDTO
     public class CommentDeleteDto : IRequestDto<Comment>
     {
         public int Id { get; set; }
-        public void Populate(Comment entity)
+        public void PopulateEntity(Comment entity)
         {
            this.Id = entity.Id;
         }

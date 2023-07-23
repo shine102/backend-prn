@@ -51,7 +51,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
     public virtual async Task<ActionResult<TResponseDto>> Create(TRequestDto dto)
     {
         var entity = new T();
-        dto.Populate(entity);
+        dto.PopulateEntity(entity);
         if (!await this.repository.CreateAsync(entity)) return this.BadRequest();
         return TResponseDto.FromEntity(entity);
     }
@@ -62,7 +62,7 @@ public abstract class CrudController<T, TRequestDto, TResponseDto> : ControllerB
     {
         var entity = await this.repository.GetByIdAsync(id);
         if (entity is null) return this.NotFound();
-        dto.Populate(entity);
+        dto.PopulateEntity(entity);
         if (!await this.repository.UpdateAsync(entity)) return this.BadRequest();
         return this.Ok();
     }

@@ -11,7 +11,7 @@ public class BookRequestDto : IRequestDto<Book>, IValidatableObject
     public string Content    { get; init; }
     public int    CategoryId { get; init; }
 
-    public void Populate(Book entity)
+    public void PopulateEntity(Book entity)
     {
         entity.Title      = this.Title;
         entity.Image      = this.Image;

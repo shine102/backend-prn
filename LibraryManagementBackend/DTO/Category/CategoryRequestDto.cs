@@ -7,7 +7,7 @@ public class CategoryRequestDto : IRequestDto<Category>, IValidatableObject
 {
     public string Name { get; init; }
 
-    public void Populate(Category entity)
+    public void PopulateEntity(Category entity)
     {
         entity.Name = this.Name;
     }

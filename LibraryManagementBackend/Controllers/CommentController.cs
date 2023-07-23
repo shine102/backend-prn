@@ -35,7 +35,7 @@ namespace LibraryManagementBackend.Controllers
         public async Task<ActionResult<CommentResponseDto>> Post(CommentCreateDto comment)
         {
             var commentEntity = new Comment();
-            comment.Populate(commentEntity);
+            comment.PopulateEntity(commentEntity);
             bool result = await commentRepository.CreateCommentAsync(comment);
             if (!result)
             {
