@@ -8,7 +8,8 @@ namespace LibraryManagementBackend.DTO.UserDTO
         public string Username { get; set; }
         public string PhoneNumber { get; set; }
         public string CredentialCode { get; set; }
-        public void Populate(User entity)
+       
+        public void PopulateEntity(User entity)
         {
             this.Id = entity.Id;
             this.Username = entity.Username;
