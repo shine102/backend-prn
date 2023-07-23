@@ -21,6 +21,9 @@ namespace LibraryManagementBackend.Repositories.CommentRepo
 
         public Task<bool> CreateCommentAsync(CommentCreateDto commentCreateDto)
         {
+            if(!this.context.Books.Any(e=>e.Id==commentCreateDto.BookId) || !this.context.Users.Any(e=>e.Username==commentCreateDto.Username)) {
+                return Task.FromResult(false);
+            }
             Comment comment = new() { Content = commentCreateDto.Content, BookId = commentCreateDto.BookId, UserId = this.context.Users.Where(user => user.Username.Equals(commentCreateDto.Username)).First().Id };
             return this.CreateAsync(comment);
         }
