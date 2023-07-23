@@ -1,11 +1,8 @@
-﻿using LibraryManagementBackend.DTO;
-using LibraryManagementBackend.DTO.CommentDTO;
-using LibraryManagementBackend.DTO.UserDTO;
+﻿using LibraryManagementBackend.DTO.UserDTO;
 using LibraryManagementBackend.Models;
-using LibraryManagementBackend.Repositories.CommentRepo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.NetworkInformation;
+using LibraryManagementBackend.Repositories.User;
 
 namespace LibraryManagementBackend.Controllers
 {
@@ -18,11 +15,11 @@ namespace LibraryManagementBackend.Controllers
             this.userRepository = userRepository;
         }
 
-        [HttpGet]
+        [HttpGet("All")]
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult<List<UserResponseDto>>> GetAll()
         {
-            var listUserEntity = await this.userRepository.GetAllAsync();
+            var listUserEntity = await userRepository.GetAllAsync();
             var listUserResponse = listUserEntity.Select(e => UserResponseDto.FromEntity(e)).ToList();
             if (listUserResponse == null)
             {
@@ -31,16 +28,21 @@ namespace LibraryManagementBackend.Controllers
             return new OkObjectResult(listUserResponse);
         }
 
+        [HttpGet]
+        [Authorize(Policy = "User")]
         public async Task<ActionResult<UserResponseDto>> GetUserByName(string name)
         {
-            var user = await this.userRepository.GetUserByName(name);
+            var user = await userRepository.GetByUsernameAsync(name);
             if (user == null)
             {
                 return new NotFoundResult();
             }
-            return new OkObjectResult(user);
+            UserResponseDto u = UserResponseDto.FromEntity(user);
+            return new OkObjectResult(u);
         }
 
+        [HttpPost]
+        [Authorize(Policy = "Admin")]
         public async Task<ActionResult<UserResponseDto>> CreateUser(UserRequestDto userRequestDto)
         {
             var userEntity = new User();
@@ -49,6 +51,8 @@ namespace LibraryManagementBackend.Controllers
             return UserResponseDto.FromEntity(userEntity);
         }
 
+        [HttpDelete]
+        [Authorize(Policy = "Admin")]
         public async Task<ActionResult> DeleteUser(int id)
         {
             var user = await this.userRepository.GetByIdAsync(id);
@@ -56,6 +60,8 @@ namespace LibraryManagementBackend.Controllers
             return new OkResult();
         }
 
+        [HttpPut]
+        [Authorize(Policy = "User")]
         public async Task<ActionResult<UserResponseDto>> UpdateUserPhone(UserUpdatePhoneDto userUpdatePhoneDto)
         {
             var user = await this.userRepository.GetByIdAsync(userUpdatePhoneDto.Id);
