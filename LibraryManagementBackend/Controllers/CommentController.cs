@@ -11,10 +11,10 @@ namespace LibraryManagementBackend.Controllers
 {
     [ApiController]
     [Route("Api/[Controller]")]
-    public class CommentController
+    public class CommentController : ControllerBase
     {
-        private readonly CommentRepository commentRepository;
-        public CommentController(CommentRepository commentRepository)
+        private readonly ICommentRepository commentRepository;
+        public CommentController(ICommentRepository commentRepository)
         {
             this.commentRepository = commentRepository;
         }
@@ -35,6 +35,7 @@ namespace LibraryManagementBackend.Controllers
         public async Task<ActionResult<CommentResponseDto>> Post(CommentCreateDto comment)
         {
             var commentEntity = new Comment();
+            commentEntity.User = new();
             comment.PopulateEntity(commentEntity);
             bool result = await commentRepository.CreateCommentAsync(comment);
             if (!result)

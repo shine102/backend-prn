@@ -10,8 +10,8 @@ namespace LibraryManagementBackend.Controllers
     [Route("Api/[Controller]")]
     public class UserController : ControllerBase
     {
-        private readonly UserRepository userRepository;
-        public UserController(UserRepository userRepository) { 
+        private readonly IUserRepository userRepository;
+        public UserController(IUserRepository userRepository) { 
             this.userRepository = userRepository;
         }
 
