@@ -4,9 +4,9 @@
 	public class ChatHub : Hub
 	{
 
-		public async Task SendMessage(string user, string message, string chatId)
+		public async Task SendMessage(string userId, string partnerId, string message, string chatId)
 		{
-			await Clients.Group(chatId).SendAsync("ReceiveMessage", user, message);
+			await Clients.Group(chatId).SendAsync("ReceiveMessage", userId, message);
 		}
 
 		public async Task JoinPrivateChat(string chatId)
