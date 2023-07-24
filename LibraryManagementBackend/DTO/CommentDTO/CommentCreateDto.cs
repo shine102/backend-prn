@@ -9,9 +9,9 @@ namespace LibraryManagementBackend.DTO.CommentDTO
         public string Username { get; set; }
         public void PopulateEntity(Comment entity)
         {
-            this.Content = entity.Content;
-            this.BookId = entity.BookId;
-            this.Username = entity.User.Username;
+            entity.Content = Content;
+            entity.BookId = BookId;
+            entity.User.Username = Username;
         }
     }
 }

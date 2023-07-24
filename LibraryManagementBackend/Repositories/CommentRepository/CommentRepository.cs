@@ -31,6 +31,7 @@ namespace LibraryManagementBackend.Repositories.CommentRepo
         public Task<bool> DeleteComment(CommentDeleteDto commentDeleteDto)
         {
             var comment = this.context.Comments.FirstOrDefault(cmt=>cmt.Id.Equals(commentDeleteDto.Id));
+            if(comment == null) return Task.FromResult(false);
             return this.DeleteAsync(comment);
         }
 
