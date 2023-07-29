@@ -90,67 +90,72 @@ namespace LibraryManagementBackend.Business.ChatService
 			{
 				return false;
 			}
-			// from sender_id and receiver_id get chat
-			List<Participant> Participant_sender = _context.Participants.Where(p => p.UserId == sendMessage.sender_id).ToList();
-			List<Participant> Participant_receiver = _context.Participants.Where(p => p.UserId == sendMessage.receiver_id).ToList();
-			foreach (Participant p in Participant_sender)
+			var commonChat = _context.Participants
+							.Where(p => p.UserId == sendMessage.sender_id)
+							.Join(_context.Participants.Where(p => p.UserId == sendMessage.receiver_id),
+								p1 => p1.ChatId,
+								p2 => p2.ChatId,
+								(p1, p2) => p1.ChatId)
+							.FirstOrDefault();
+			if (commonChat != null)
 			{
-				foreach(Participant p2 in Participant_receiver)
+				_context.Messages.Add(new Message()
 				{
-					if (p.ChatId == p2.ChatId)
-					{
-						_context.Messages.Add(new Message()
-						{
-							ChatId = p.ChatId,
-							Content = sendMessage.content,
-							UserId = sendMessage.sender_id
-						});
-						Chat chat = _context.Chats.Where(c => c.Id == p.ChatId).FirstOrDefault();
-						chat.LastMessage = sendMessage.content;
-						await _context.SaveChangesAsync();
-						return true;
-					}
-				}
-			}
-			try
-			{
-				Chat newChat = new()
-				{
-					LastMessage = sendMessage.content
-				};
-				await _context.Chats.AddAsync(newChat);
-				await _context.SaveChangesAsync();
-
-				Participant Participant1 = new()
-				{
-					ChatId = newChat.Id,
-					UserId = sendMessage.sender_id
-				};
-				Console.WriteLine(Participant1.ChatId);
-				await _context.Participants.AddAsync(Participant1);
-
-				Participant Participant2 = new()
-				{
-					ChatId = newChat.Id,
-					UserId = sendMessage.receiver_id
-				};
-				await _context.Participants.AddAsync(Participant2);
-
-				Message message = new()
-				{
-					ChatId = newChat.Id,
+					ChatId = commonChat,
 					Content = sendMessage.content,
 					UserId = sendMessage.sender_id
-				};
-				await _context.Messages.AddAsync(message);
+				});
 
+				Chat chat = _context.Chats.FirstOrDefault(c => c.Id == commonChat);
+				if (chat != null)
+				{
+					chat.LastMessage = sendMessage.content;
+				}
 				await _context.SaveChangesAsync();
-
 				return true;
-			} catch(Exception e)
+			}
+			else
 			{
-				Console.WriteLine(e.Message);
-				return false;
+				try
+				{
+					Chat newChat = new()
+					{
+						LastMessage = sendMessage.content
+					};
+					_context.Chats.Add(newChat);
+					await _context.SaveChangesAsync();
+
+					Participant Participant1 = new()
+					{
+						ChatId = newChat.Id,
+						UserId = sendMessage.sender_id
+					};
+
+					await _context.Participants.AddAsync(Participant1);
+
+					Participant Participant2 = new()
+					{
+						ChatId = newChat.Id,
+						UserId = sendMessage.receiver_id
+					};
+					await _context.Participants.AddAsync(Participant2);
+
+					Message message = new()
+					{
+						ChatId = newChat.Id,
+						Content = sendMessage.content,
+						UserId = sendMessage.sender_id
+					};
+					await _context.Messages.AddAsync(message);
+
+					await _context.SaveChangesAsync();
+
+					return true;
+				} catch(Exception e)
+				{
+					Console.WriteLine(e.Message);
+					return false;
+				}
 			}
 		}
 	}
